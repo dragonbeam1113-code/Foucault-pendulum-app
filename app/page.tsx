@@ -4,6 +4,13 @@ import { useState } from "react";
 
 const EQUATOR_THRESHOLD = 5;
 
+const PRESET_LATITUDES = [
+  { label: "0°（赤道）", value: "0" },
+  { label: "40.6°（弘前付近）", value: "40.6" },
+  { label: "90°（北極）", value: "90" },
+  { label: "-90°（南極）", value: "-90" },
+];
+
 function getDescription(latitude: number): string {
   if (Math.abs(latitude) < EQUATOR_THRESHOLD) {
     return "赤道付近では見かけの回転はほぼ起こりません。";
@@ -56,12 +63,24 @@ export default function Home() {
           step="any"
           value={latitude}
           onChange={(e) => setLatitude(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 mb-3"
           placeholder="例：40.6"
         />
 
+        <div className="flex flex-wrap gap-2 mb-4">
+          {PRESET_LATITUDES.map((preset) => (
+            <button
+              key={preset.value}
+              onClick={() => setLatitude(preset.value)}
+              className="px-3 py-1 text-sm bg-gray-100 hover:bg-blue-100 text-gray-700 rounded-lg border border-gray-300"
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+
         {!isValidLatitude && (
-          <p className="text-red-500 text-sm">
+          <p className="text-red-500 text-sm mb-4">
             -90〜90の範囲で入力してください。
           </p>
         )}
@@ -82,6 +101,20 @@ export default function Home() {
             </p>
           </div>
         )}
+
+        <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <p className="text-gray-700 text-sm font-medium mb-1">計算式について</p>
+          <p className="text-gray-600 text-sm">
+            このアプリでは学習用の近似として、次の式を使っています。
+          </p>
+          <p className="text-gray-800 text-sm font-mono mt-2">
+            周期 = 24 ÷ |sin(緯度)|
+          </p>
+          <p className="text-gray-500 text-xs mt-2">
+            緯度0度付近では sin(緯度) がほぼ0になるため、周期が非常に大きくなります。
+            そのため赤道付近では「見かけの回転はほぼ起こらない」と表示しています。
+          </p>
+        </div>
       </div>
     </main>
   );
