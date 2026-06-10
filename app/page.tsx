@@ -4,6 +4,39 @@ import { useState } from "react";
 
 const EQUATOR_THRESHOLD = 5;
 
+type City = {
+  name: string;
+  country: string;
+  latitude: number;
+};
+
+const CITIES: City[] = [
+  { name: "弘前市", country: "日本", latitude: 40.6 },
+  { name: "青森市", country: "日本", latitude: 40.8 },
+  { name: "ニューヨーク", country: "アメリカ", latitude: 40.7 },
+  { name: "ローマ", country: "イタリア", latitude: 41.9 },
+  { name: "東京", country: "日本", latitude: 35.7 },
+  { name: "大阪", country: "日本", latitude: 34.7 },
+  { name: "カイロ", country: "エジプト", latitude: 30.0 },
+  { name: "ホノルル", country: "アメリカ", latitude: 21.3 },
+  { name: "シンガポール", country: "シンガポール", latitude: 1.3 },
+  { name: "キト", country: "エクアドル", latitude: -0.2 },
+  { name: "シドニー", country: "オーストラリア", latitude: -33.9 },
+  { name: "ブエノスアイレス", country: "アルゼンチン", latitude: -34.6 },
+  { name: "ケープタウン", country: "南アフリカ", latitude: -33.9 },
+  { name: "ウシュアイア", country: "アルゼンチン", latitude: -54.8 },
+];
+
+function findNearbyCities(inputLatitude: number, count: number) {
+  return CITIES
+    .map((city) => ({
+      ...city,
+      diff: Math.abs(inputLatitude - city.latitude),
+    }))
+    .sort((a, b) => a.diff - b.diff)
+    .slice(0, count);
+}
+
 const PRESET_LATITUDES = [
   { label: "0°（赤道）", value: "0" },
   { label: "40.6°（弘前付近）", value: "40.6" },
@@ -41,6 +74,8 @@ export default function Home() {
     isValidLatitude && !isEquator
       ? calculatePeriodHours(latitudeNumber)
       : null;
+
+  const nearbyCities = isValidLatitude ? findNearbyCities(latitudeNumber, 3) : [];
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -99,6 +134,20 @@ export default function Home() {
             <p className="text-gray-600 text-sm mt-2">
               {getDescription(latitudeNumber)}
             </p>
+          </div>
+        )}
+
+        {isValidLatitude && (
+          <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
+            <p className="text-gray-700 text-sm font-medium mb-2">緯度が近い代表都市</p>
+            <ul className="space-y-1">
+              {nearbyCities.map((city) => (
+                <li key={`${city.name}-${city.country}`} className="flex justify-between text-sm text-gray-700">
+                  <span>{city.name}（{city.country}）</span>
+                  <span className="text-gray-500">緯度 {city.latitude}° ／ 差 {city.diff.toFixed(1)}°</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
